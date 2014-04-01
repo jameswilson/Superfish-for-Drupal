@@ -106,44 +106,66 @@
 
     // Create the new version, hide the original.
     function convert(menu){
-      var menuID = menu.attr('id'),
-      // Creating a refined version of the menu.
-      refinedMenu = refine(menu);
+      var menuID = menu.attr('id');
+
+      if (menu.data('sf-fullscreen-id') !== undefined){
+        menuID = menu.data('sf-fullscreen-id');
+      }
+
       // Currently the plugin provides two reactions to small screens.
       // Converting the menu to a <select> element, and converting to an accordion version of the menu.
       if (options.type == 'accordion'){
         var
         toggleID = menuID + '-toggle',
         accordionID = menuID + '-accordion';
-        // Making sure the accordion does not exist.
-        if ($('#' + accordionID).length == 0){
-          var
-          // Getting the style class.
-          styleClass = menu.attr('class').split(' ').filter(function(item){
-            return item.indexOf('sf-style-') > -1 ? item : '';
-          }),
+
+        // Removing style attributes and any unnecessary class from list elements.
+        menu.find('ul,li').removeAttr('style');
+        // Collapsing all children.
+        menu.children('li.sfHover').removeClass('sfHover').children('ul').hide().addClass('sf-hidden');
+
+        // If the accordion exists, do some quick conversions.
+        if (menu.data('sf-smallscreen-id') !== undefined){
+
+          // Replacing the id and class for smallscreen version.
+          menu.attr('id', menu.data('sf-smallscreen-id'));
+          menu.attr('class', menu.data('sf-smallscreen-class'));
+
+          // Showing the toggle button.
+          $('#' + toggleID).parent('div').show();
+        }
+        // If the accordion does not exist, build it.
+        else {
+          // Saving fullscreen classes and id for later use.
+          menu.data('sf-fullscreen-class', menu.attr('class'));
+          menu.data('sf-fullscreen-id', menu.attr('id'));
           // Creating the accordion.
-          accordion = $(refinedMenu).attr('id', accordionID);
+          menu.attr('id', accordionID);
           // Removing unnecessary classes.
-          accordion.removeClass('sf-horizontal sf-vertical sf-navbar sf-shadow sf-js-enabled');
+          menu.removeClass('sf-horizontal sf-vertical sf-navbar sf-shadow sf-js-enabled');
           // Adding necessary classes.
-          accordion.addClass('sf-accordion sf-hidden');
-          // Removing style attributes and any unnecessary class.
-          accordion.children('li').removeAttr('style').removeClass('sfHover');
-          // Doing the same and making sure all the sub-menus are off-screen (hidden).
-          accordion.find('ul').removeAttr('style').not('.sf-hidden').addClass('sf-hidden');
+          menu.addClass('sf-accordion sf-hidden');
+          // Saving smallscreen classes and id for later use.
+          menu.data('sf-smallscreen-class', menu.attr('class'));
+          menu.data('sf-smallscreen-id', menu.attr('id'));
+
+
+          // Getting the style class.
+          var styleClass = menu.attr('class').split(' ').filter(function(item){
+            return item.indexOf('sf-style-') > -1 ? item : '';
+          });
           // Creating the accordion toggle switch.
           var toggle = '<div class="sf-accordion-toggle ' + styleClass + '"><a href="#" id="' + toggleID + '"><span>' + options.title + '</span></a></div>';
+          // Inserting the accordion menu toggle.
+          menu.before(toggle);
 
           // Adding Expand\Collapse buttons if requested.
           if (options.accordionButton == 2){
-            var parent = accordion.find('li.menuparent');
+            var parent = menu.find('li.menuparent');
             for (var i = 0; i < parent.length; i++){
               parent.eq(i).prepend('<a href="#" class="sf-accordion-button">' + options.expandText + '</a>');
             }
           }
-          // Inserting the according and hiding the original menu.
-          menu.before(toggle).before(accordion).hide();
 
           var
           accordionElement = $('#' + accordionID),
@@ -226,8 +248,12 @@
             }
           });
         }
+
       }
       else {
+        // Creating a refined version of the menu.
+        refinedMenu = refine(menu);
+
         var
         // Class names modification.
         menuClone = menu.clone(),
@@ -237,6 +263,13 @@
 
         // Making sure the <select> element does not exist already.
         if ($('#' + menuID + '-select').length !== 0){
+
+          // Showing the select menu.
+          $('#' + menuID + '-select').show();
+          // Hideing the original menu.
+          menu.hide();
+        }
+        else {
           // Creating the <option> elements.
           var newMenu = toSelect(refinedMenu, 1),
           // Creating the <select> element and assigning an ID and class name.
@@ -259,16 +292,33 @@
 
     // Turn everything back to normal.
     function turnBack(menu){
-      var
-      id = '#' + menu.attr('id');
-      // Removing the small screen version.
-      $(id + '-' + options.type).remove();
-      // Removing the accordion toggle switch as well.
       if (options.type == 'accordion'){
-        $(id + '-toggle').parent('div').remove();
+        // Removing the accordion toggle switch as well.
+        $(id + '-toggle').parent('div').hide();
+        if (menu.data('sf-fullscreen-id') !== 0){
+          // Restoring fullscreen version.
+          menu.attr('id', menu.data('sf-fullscreen-id'));
+          menu.attr('class', menu.data('sf-fullscreen-class'));
+
+          // Hide accordion toggle.
+          toggleID = menu.data('sf-fullscreen-id') + '-toggle';
+          $('#' + toggleID).parent('div').hide();
+
+          // Hide accordion expand buttons.
+          menu.find('.sf-accordion-button').hide();
+
+          // Collapsing any expanded children.
+          menu.find('li.sf-expanded').removeClass('sf-expanded').children('ul').hide().addClass('sf-hidden');
+        }
+      } else {
+        var
+        id = '#' + menu.attr('id');
+        // Removing the <select>.
+        $(id + '-' + options.type).hide();
+
+        // Show the original menu.
+        $(id).show();
       }
-      // Crystal clear!
-      $(id).show();
     }
 
     // Return original object to support chaining.
