@@ -82,18 +82,18 @@
           path = item.is('a') ? item.attr('href') : '',
           // Class names modification.
           itemClone = item.clone(),
-          classes = (options.hyperlinkClasses) ? ((options.excludeClass_hyperlink && itemClone.hasClass(options.excludeClass_hyperlink)) ? itemClone.removeClass(options.excludeClass_hyperlink).attr('class') : itemClone.attr('class')) : '',
+          classes = (options.hyperlinkClasses) ? ((options.excludeClass_hyperlink && itemClone.hasClass(options.excludeClass_hyperlink)) ? itemClone.removeClass(options.excludeClass_hyperlink).attr('class') : itemClone.attr('class')) : '';
           classes = (options.includeClass_hyperlink && !itemClone.hasClass(options.includeClass_hyperlink)) ? ((options.hyperlinkClasses) ? itemClone.addClass(options.includeClass_hyperlink).attr('class') : options.includeClass_hyperlink) : classes;
           // Retaining the active class if requested.
           if (options.addSelected && item.hasClass('active')){
             classes += ' active';
           }
           // <option> has to be disabled if the item is not a link.
-          disable = item.is('span') ? ' disabled="disabled"' : '',
+          disable = item.is('span') ? ' disabled="disabled"' : '';
           // Crystal clear.
           subIndicator = 1 < level ? Array(level).join('-') + ' ' : '';
           // Preparing the <option> element.
-          items += '<option value="' + path + '" class="' + classes + '"' + disable + '>' + subIndicator + $.trim(item.text()) +'</option>',
+          items += '<option value="' + path + '" class="' + classes + '"' + disable + '>' + subIndicator + $.trim(item.text()) + '</option>';
           childUL = list.find('> ul');
           // Using the function for the sub-menu of this item.
           for (var u = 0; u < childUL.length; u++){
@@ -188,10 +188,10 @@
               var parent = $(this).closest('li');
               // Creating and inserting Expand\Collapse buttons to the parent menu items,
               // of course only if not already happened.
-              if (options.accordionButton == 1 && parent.children('a.menuparent,span.nolink.menuparent').length > 0 && parent.children('ul').children('li.sf-clone-parent').length == 0){
+              if (options.accordionButton == 1 && parent.children('a.menuparent,span.nolink.menuparent').length > 0 && parent.children('ul').children('li.sf-clone-parent').length === 0){
                 var
                 // Cloning the hyperlink of the parent menu item.
-                cloneLink = parent.children('a.menuparent,span.nolink.menuparent').clone(),
+                cloneLink = parent.children('a.menuparent,span.nolink.menuparent').clone();
                 // Wrapping the hyerplinks in <li>.
                 cloneLink = $('<li class="sf-clone-parent" />').html(cloneLink);
                 // Adding a helper class and attaching them to the sub-menus.
@@ -230,12 +230,13 @@
       else {
         var
         // Class names modification.
-        menuClone = menu.clone(), classes = (options.menuClasses) ? ((options.excludeClass_menu && menuClone.hasClass(options.excludeClass_menu)) ? menuClone.removeClass(options.excludeClass_menu).attr('class') : menuClone.attr('class')) : '',
-        classes = (options.includeClass_menu && !menuClone.hasClass(options.includeClass_menu)) ? ((options.menuClasses) ? menuClone.addClass(options.includeClass_menu).attr('class') : options.includeClass_menu) : classes,
+        menuClone = menu.clone(),
+        classes = (options.menuClasses) ? ((options.excludeClass_menu && menuClone.hasClass(options.excludeClass_menu)) ? menuClone.removeClass(options.excludeClass_menu).attr('class') : menuClone.attr('class')) : '';
+        classes = (options.includeClass_menu && !menuClone.hasClass(options.includeClass_menu)) ? ((options.menuClasses) ? menuClone.addClass(options.includeClass_menu).attr('class') : options.includeClass_menu) : classes;
         classes = (classes) ? ' class="' + classes + '"' : '';
 
         // Making sure the <select> element does not exist already.
-        if ($('#' + menuID + '-select').length == 0){
+        if ($('#' + menuID + '-select').length !== 0){
           // Creating the <option> elements.
           var newMenu = toSelect(refinedMenu, 1),
           // Creating the <select> element and assigning an ID and class name.
@@ -299,7 +300,7 @@
         });
       }
       else if (mode == 'useragent_custom'){
-        if (options.useragent != ''){
+        if (options.useragent !== ''){
           var ua = RegExp(options.useragent, 'i');
           if (navigator.userAgent.match(ua)){
             convert(menu);
@@ -311,5 +312,5 @@
       }
     }
     return this;
-  }
+  };
 })(jQuery);
